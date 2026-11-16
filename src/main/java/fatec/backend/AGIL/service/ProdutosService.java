@@ -1,3 +1,4 @@
+
 package fatec.backend.AGIL.service;
 
 import java.util.List;
@@ -6,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import fatec.backend.AGIL.dto.ProdutosDTO;
 import fatec.backend.AGIL.model.Produtos;
 import fatec.backend.AGIL.repository.ProdutosRepository;
 
@@ -18,51 +20,99 @@ public class ProdutosService {
         this.produtosRepository = produtosRepository;
     }
 
-    public List<Produtos> listarTodos() {
-        return produtosRepository.findAll();
+    // Entidade para DTO
+    private ProdutosDTO converterDTO(Produtos produto) {
+        return new ProdutosDTO(
+            produto.getId(),
+            produto.getNome(),
+            produto.getPreco()
+        );
     }
 
-    public Produtos salvar(Produtos produtos) {
-        produtos.setId(null);
-        return produtosRepository.save(produtos); 
+    // DTO para entidade
+    private Produtos converterEntidade(ProdutosDTO dto) {
+        Produtos produto = new Produtos();
+
+        produto.setId(dto.id());
+        produto.setNome(dto.nome());
+        produto.setPreco(dto.preco());
+
+        return produto;
     }
 
-    public Produtos buscarPorId(Long id) {
-        return produtosRepository.findById(id)
+    // GET - listar todos
+    public List<ProdutosDTO> listarTodos() {
+        return produtosRepository.findAll()
+                .stream()
+                .map(this::converterDTO)
+                .toList();
+    }
+
+    // POST - salvar
+    public ProdutosDTO salvar(ProdutosDTO dto) {
+        Produtos produto = converterEntidade(dto);
+        produto.setId(null);
+
+        Produtos salvo = produtosRepository.save(produto);
+
+        return converterDTO(salvo);
+    }
+
+    // GET - buscar por ID
+    public ProdutosDTO buscarPorId(Long id) {
+        Produtos produto = produtosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Produto não encontrado: id " + id));
+                        HttpStatus.NOT_FOUND,
+                        "Produto não encontrado: id " + id));
+
+        return converterDTO(produto);
     }
 
-    public Produtos atualizarCampo(Long id, Produtos dados) {
-    Produtos produto = produtosRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+    // PATCH - atualizar campos 
+    public ProdutosDTO atualizarCampo(Long id, ProdutosDTO dados) {
+        Produtos produto = produtosRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto não encontrado: id " + id));
 
-    if (dados.getNome() != null) {
-        produto.setNome(dados.getNome());
+        if (dados.nome() != null) {
+            produto.setNome(dados.nome());
+        }
+
+        if (dados.preco() != null) {
+            produto.setPreco(dados.preco());
+        }
+
+        Produtos atualizado = produtosRepository.save(produto);
+
+        return converterDTO(atualizado);
     }
 
-    if (dados.getPreco() != null) {
-        produto.setPreco(dados.getPreco());
+    // PUT - atualizar geral
+    public ProdutosDTO atualizar(Long id, ProdutosDTO novo) {
+        Produtos existente = produtosRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto não encontrado: id " + id));
+
+        existente.setNome(novo.nome());
+        existente.setPreco(novo.preco());
+
+        Produtos atualizado = produtosRepository.save(existente);
+
+        return converterDTO(atualizado);
     }
 
-    return produtosRepository.save(produto); }
-
-
-    public Produtos atualizar(Long id, Produtos novo) {
-        Produtos existente = buscarPorId(id);
-
-        existente.setNome(novo.getNome());
-        existente.setPreco(novo.getPreco());
-
-        return produtosRepository.save(existente);
-    }
-
+    // DELETE 
     public void excluir(Long id) {
         if (!produtosRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Produto não encontrado: id " + id);
+                    HttpStatus.NOT_FOUND,
+                    "Produto não encontrado: id " + id);
         }
-        produtosRepository.deleteById(id); 
+
+        produtosRepository.deleteById(id);
     }
 }
+
 
