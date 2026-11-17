@@ -4,12 +4,13 @@ import fatec.backend.AGIL.dto.FuncionarioAtualizacaoDTO;
 import fatec.backend.AGIL.dto.FuncionarioCadastroDTO;
 import fatec.backend.AGIL.dto.FuncionarioRespostaDTO;
 import fatec.backend.AGIL.dto.FuncionarioSenhaDTO;
+import fatec.backend.AGIL.dto.LoginDTO;
 import fatec.backend.AGIL.model.FuncionarioModel;
 import fatec.backend.AGIL.model.GestorModel;
 import fatec.backend.AGIL.repository.FuncionarioRepository;
 import fatec.backend.AGIL.repository.GestorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class FuncionarioService {
     @Autowired
     private GestorRepository gestorRepository;
 
-    // Instancia o encriptador BCrypt para a senha
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    // Encriptador BCrypt registrado como @Bean no SecurityConfig
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // 1. Cadastrar Funcionário
     public FuncionarioRespostaDTO cadastrar(FuncionarioCadastroDTO dto) {
@@ -123,5 +125,16 @@ public class FuncionarioService {
             throw new RuntimeException("Funcionário não encontrado com o ID: " + id);
         }
         funcionarioRepository.deleteById(id);
+    }
+
+    // 7. Login
+    public FuncionarioRespostaDTO login(LoginDTO dto) {
+        FuncionarioModel funcionario = funcionarioRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+
+        if (!passwordEncoder.matches(dto.getSenha(), funcionario.getSenha())) {
+            throw new RuntimeException("Credenciais inválidas");
+        }
+        return new FuncionarioRespostaDTO(funcionario);
     }
 }
