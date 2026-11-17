@@ -39,6 +39,11 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
+        if (msg != null && msg.contains("Credenciais inválidas")) {
+            error.put("erro", msg);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
         if (msg != null && (msg.contains("já está cadastrado") || msg.contains("já está sendo utilizado"))) {
             error.put("erro", msg);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

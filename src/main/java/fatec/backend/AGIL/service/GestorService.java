@@ -3,6 +3,7 @@ package fatec.backend.AGIL.service;
 import fatec.backend.AGIL.dto.GestorAtualizacaoDTO;
 import fatec.backend.AGIL.dto.GestorCadastroDTO;
 import fatec.backend.AGIL.dto.GestorRespostaDTO;
+import fatec.backend.AGIL.dto.LoginDTO;
 import fatec.backend.AGIL.model.GestorModel;
 import fatec.backend.AGIL.repository.GestorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,5 +97,16 @@ public class GestorService {
     // 6. Deletar todos os gestores cadastrados
     public void deletarTodos() {
         gestorRepository.deleteAll();
+    }
+
+    // 7. Login
+    public GestorRespostaDTO login(LoginDTO dto) {
+        GestorModel gestor = gestorRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+
+        if (!passwordEncoder.matches(dto.getSenha(), gestor.getSenha())) {
+            throw new RuntimeException("Credenciais inválidas");
+        }
+        return new GestorRespostaDTO(gestor);
     }
 }
