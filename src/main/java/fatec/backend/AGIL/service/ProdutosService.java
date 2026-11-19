@@ -17,15 +17,18 @@ public class ProdutosService {
     private final ProdutosRepository produtosRepository;
     private final GestorRepository gestorRepository;
     private final HistoricoService historicoService;
+    private final NotificacaoService notificacaoService;
 
     public ProdutosService(
             ProdutosRepository produtosRepository,
             GestorRepository gestorRepository,
-            HistoricoService historicoService) {
+            HistoricoService historicoService,
+            NotificacaoService notificacaoService) {
 
         this.produtosRepository = produtosRepository;
         this.gestorRepository = gestorRepository;
         this.historicoService = historicoService;
+        this.notificacaoService = notificacaoService;
     }
 
     // Entidade para DTO
@@ -99,6 +102,9 @@ public class ProdutosService {
             );
         }
 
+        // Verifica se precisa gerar uma notificação
+        notificacaoService.verificarEstoque(salvo);
+
         return converterDTO(salvo);
     }
 
@@ -150,11 +156,15 @@ public class ProdutosService {
 
         Produtos atualizado = produtosRepository.save(produto);
 
+        // Registra a entrada ou saída no histórico
         registrarDiferenca(
             atualizado,
             estoqueAnterior,
             qtdPorCaixaAnterior
         );
+
+        // Verifica o estoque e atualiza as notificações
+        notificacaoService.verificarEstoque(atualizado);
 
         return converterDTO(atualizado);
     }
@@ -184,11 +194,15 @@ public class ProdutosService {
 
         Produtos atualizado = produtosRepository.save(existente);
 
+        // Registra a entrada ou saída no histórico
         registrarDiferenca(
             atualizado,
             estoqueAnterior,
             qtdPorCaixaAnterior
         );
+
+        // Verifica o estoque e atualiza as notificações
+        notificacaoService.verificarEstoque(atualizado);
 
         return converterDTO(atualizado);
     }
@@ -200,6 +214,7 @@ public class ProdutosService {
             Integer qtdPorCaixaAnterior) {
 
         int anterior = estoqueAnterior != null ? estoqueAnterior : 0;
+
         int atual = produto.getEstoqueCaixas() != null
                 ? produto.getEstoqueCaixas()
                 : 0;
