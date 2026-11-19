@@ -1,11 +1,8 @@
 package fatec.backend.AGIL.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
-
 @Entity
+@Table(name = "produtos")
 public class Produtos {
 
     @Id
@@ -13,9 +10,16 @@ public class Produtos {
     private Long id;
 
     private String nome;
+
     private BigDecimal preco;
+
     private Integer estoqueCaixas;
+
     private Integer qtdPorCaixa;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_gestor", nullable = false)
+    private GestorModel gestor;
 
     public Long getId() {
         return id;
@@ -55,5 +59,13 @@ public class Produtos {
 
     public void setQtdPorCaixa(Integer qtdPorCaixa) {
         this.qtdPorCaixa = qtdPorCaixa;
+    }
+
+    public GestorModel getGestor() {
+        return gestor;
+    }
+
+    public void setGestor(GestorModel gestor) {
+        this.gestor = gestor;
     }
 }

@@ -2,19 +2,9 @@
 package fatec.backend.AGIL.controller;
 
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import fatec.backend.AGIL.dto.ProdutosDTO;
 import fatec.backend.AGIL.service.ProdutosService;
 
@@ -28,47 +18,57 @@ public class ProdutosController {
         this.produtosService = produtosService;
     }
 
-    // GET em todos
+    // GET - listar produtos
     @GetMapping
-    public List<ProdutosDTO> listarTodos() {
-        return produtosService.listarTodos();
+    public List<ProdutosDTO> listarTodos(
+            @RequestParam(required = false) Long gestorId) {
+
+        return produtosService.listarTodos(gestorId);
     }
 
-    // GET por ID
+    // GET - buscar por ID
     @GetMapping("/{id}")
     public ProdutosDTO buscar(@PathVariable Long id) {
         return produtosService.buscarPorId(id);
     }
 
-    // POST
+    // POST - cadastrar
     @PostMapping
-    public ResponseEntity<ProdutosDTO> criar(@RequestBody ProdutosDTO produtos) {
+    public ResponseEntity<ProdutosDTO> criar(
+            @RequestBody ProdutosDTO produtos) {
+
         ProdutosDTO produtoSalvo = produtosService.salvar(produtos);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtoSalvo);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(produtoSalvo);
     }
 
-    // PATCH
+    // PATCH - atualizar campos
     @PatchMapping("/{id}")
     public ResponseEntity<ProdutosDTO> atualizarCampo(
-        @PathVariable Long id,
-        @RequestBody ProdutosDTO dados) {
+            @PathVariable Long id,
+            @RequestBody ProdutosDTO dados) {
 
         return ResponseEntity.ok(
             produtosService.atualizarCampo(id, dados)
         );
     }
 
-    // PUT 
+    // PUT - atualizar geral
     @PutMapping("/{id}")
-    public ProdutosDTO atualizar(@PathVariable Long id, @RequestBody ProdutosDTO produtos) {
+    public ProdutosDTO atualizar(
+            @PathVariable Long id,
+            @RequestBody ProdutosDTO produtos) {
+
         return produtosService.atualizar(id, produtos);
     }
 
-    // DELETE
+    // DELETE - excluir
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
+
         produtosService.excluir(id);
+
         return ResponseEntity.noContent().build();
     }
 }
