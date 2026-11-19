@@ -1,5 +1,4 @@
 package fatec.backend.AGIL.model;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +14,8 @@ public class Produtos {
 
     private String nome;
     private BigDecimal preco;
+    private Integer estoqueCaixas;
+    private Integer qtdPorCaixa;
 
     public Long getId() {
         return id;
@@ -32,7 +33,7 @@ public class Produtos {
         this.nome = nome;
     }
 
-     public BigDecimal getPreco() {
+    public BigDecimal getPreco() {
         return preco;
     }
 
@@ -40,4 +41,19 @@ public class Produtos {
         this.preco = preco;
     }
 
+    public Integer getEstoqueCaixas() {
+        return estoqueCaixas;
+    }
+
+    public void setEstoqueCaixas(Integer estoqueCaixas) {
+        this.estoqueCaixas = estoqueCaixas;
+    }
+
+    public Integer getQtdPorCaixa() {
+        return qtdPorCaixa;
+    }
+
+    public void setQtdPorCaixa(Integer qtdPorCaixa) {
+        this.qtdPorCaixa = qtdPorCaixa;
+    }
 }

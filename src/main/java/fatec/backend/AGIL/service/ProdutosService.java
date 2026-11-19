@@ -1,6 +1,4 @@
-
 package fatec.backend.AGIL.service;
-
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -25,7 +23,9 @@ public class ProdutosService {
         return new ProdutosDTO(
             produto.getId(),
             produto.getNome(),
-            produto.getPreco()
+            produto.getPreco(),
+            produto.getEstoqueCaixas(),
+            produto.getQtdPorCaixa()
         );
     }
 
@@ -36,6 +36,8 @@ public class ProdutosService {
         produto.setId(dto.id());
         produto.setNome(dto.nome());
         produto.setPreco(dto.preco());
+        produto.setEstoqueCaixas(dto.estoqueCaixas());
+        produto.setQtdPorCaixa(dto.qtdPorCaixa());
 
         return produto;
     }
@@ -68,7 +70,7 @@ public class ProdutosService {
         return converterDTO(produto);
     }
 
-    // PATCH - atualizar campos 
+    // PATCH - atualizar campos
     public ProdutosDTO atualizarCampo(Long id, ProdutosDTO dados) {
         Produtos produto = produtosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -81,6 +83,14 @@ public class ProdutosService {
 
         if (dados.preco() != null) {
             produto.setPreco(dados.preco());
+        }
+
+        if (dados.estoqueCaixas() != null) {
+            produto.setEstoqueCaixas(dados.estoqueCaixas());
+        }
+
+        if (dados.qtdPorCaixa() != null) {
+            produto.setQtdPorCaixa(dados.qtdPorCaixa());
         }
 
         Produtos atualizado = produtosRepository.save(produto);
@@ -97,13 +107,15 @@ public class ProdutosService {
 
         existente.setNome(novo.nome());
         existente.setPreco(novo.preco());
+        existente.setEstoqueCaixas(novo.estoqueCaixas());
+        existente.setQtdPorCaixa(novo.qtdPorCaixa());
 
         Produtos atualizado = produtosRepository.save(existente);
 
         return converterDTO(atualizado);
     }
 
-    // DELETE 
+    // DELETE
     public void excluir(Long id) {
         if (!produtosRepository.existsById(id)) {
             throw new ResponseStatusException(
@@ -114,5 +126,3 @@ public class ProdutosService {
         produtosRepository.deleteById(id);
     }
 }
-
-
