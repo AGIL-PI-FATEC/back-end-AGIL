@@ -1,9 +1,11 @@
+
 package fatec.backend.AGIL.service;
 
 import fatec.backend.AGIL.dto.FuncionarioAtualizacaoDTO;
 import fatec.backend.AGIL.dto.FuncionarioCadastroDTO;
 import fatec.backend.AGIL.dto.FuncionarioRespostaDTO;
 import fatec.backend.AGIL.dto.FuncionarioSenhaDTO;
+import fatec.backend.AGIL.dto.LoginDTO;
 import fatec.backend.AGIL.model.FuncionarioModel;
 import fatec.backend.AGIL.model.GestorModel;
 import fatec.backend.AGIL.repository.FuncionarioRepository;
@@ -56,6 +58,18 @@ public class FuncionarioService {
 
         FuncionarioModel salvo = funcionarioRepository.save(funcionario);
         return new FuncionarioRespostaDTO(salvo);
+    }
+
+    // 7. Login do Funcionário
+    public FuncionarioRespostaDTO login(LoginDTO dto) {
+        FuncionarioModel funcionario = funcionarioRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos."));
+
+        if (!passwordEncoder.matches(dto.getSenha(), funcionario.getSenha())) {
+            throw new RuntimeException("E-mail ou senha inválidos.");
+        }
+
+        return new FuncionarioRespostaDTO(funcionario);
     }
 
     // 2. Buscar por ID
