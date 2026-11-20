@@ -8,6 +8,7 @@ public record ProdutosDTO(
     BigDecimal preco,
     Integer estoqueCaixas,
     Integer qtdPorCaixa,
-    Long gestorId
+    Long gestorId,
+    String imagem
 ) {
 }

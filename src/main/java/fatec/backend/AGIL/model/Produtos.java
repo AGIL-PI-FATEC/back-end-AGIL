@@ -8,14 +8,12 @@ public class Produtos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nome;
-
     private BigDecimal preco;
-
     private Integer estoqueCaixas;
-
     private Integer qtdPorCaixa;
+    @Column(columnDefinition = "LONGTEXT")
+    private String imagem;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_gestor", nullable = false)
@@ -67,5 +65,12 @@ public class Produtos {
 
     public void setGestor(GestorModel gestor) {
         this.gestor = gestor;
+    }
+    public String getImagem() {
+    return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }
 }

@@ -31,7 +31,7 @@ public class ProdutosService {
         this.notificacaoService = notificacaoService;
     }
 
-    // Entidade para DTO
+    // A. Entidade para DTO com a imagem
     private ProdutosDTO converterDTO(Produtos produto) {
 
         return new ProdutosDTO(
@@ -40,7 +40,8 @@ public class ProdutosService {
             produto.getPreco(),
             produto.getEstoqueCaixas(),
             produto.getQtdPorCaixa(),
-            produto.getGestor().getId()
+            produto.getGestor().getId(),
+            produto.getImagem()
         );
     }
 
@@ -60,7 +61,7 @@ public class ProdutosService {
                 .toList();
     }
 
-    // POST - salvar
+    // B. POST - salvar (com suporte à imagem)
     @Transactional
     public ProdutosDTO salvar(ProdutosDTO dto) {
 
@@ -86,6 +87,7 @@ public class ProdutosService {
         produto.setEstoqueCaixas(dto.estoqueCaixas());
         produto.setQtdPorCaixa(dto.qtdPorCaixa());
         produto.setGestor(gestor);
+        produto.setImagem(dto.imagem());
 
         Produtos salvo = produtosRepository.save(produto);
 
@@ -120,7 +122,7 @@ public class ProdutosService {
         return converterDTO(produto);
     }
 
-    // PATCH - atualizar campos
+    // C. PATCH - atualizar campos (com preservação/atualização da imagem)
     @Transactional
     public ProdutosDTO atualizarCampo(Long id, ProdutosDTO dados) {
 
@@ -149,6 +151,10 @@ public class ProdutosService {
             produto.setQtdPorCaixa(dados.qtdPorCaixa());
         }
 
+        if (dados.imagem() != null) {
+            produto.setImagem(dados.imagem());
+        }
+
         validarEstoque(
             produto.getEstoqueCaixas(),
             produto.getQtdPorCaixa()
@@ -169,7 +175,7 @@ public class ProdutosService {
         return converterDTO(atualizado);
     }
 
-    // PUT - atualizar geral
+    // D. PUT - atualizar geral (com preservação/atualização condicional da imagem)
     @Transactional
     public ProdutosDTO atualizar(Long id, ProdutosDTO novo) {
 
@@ -186,6 +192,10 @@ public class ProdutosService {
         existente.setPreco(novo.preco());
         existente.setEstoqueCaixas(novo.estoqueCaixas());
         existente.setQtdPorCaixa(novo.qtdPorCaixa());
+
+        if (novo.imagem() != null) {
+            existente.setImagem(novo.imagem());
+        }
 
         validarEstoque(
             existente.getEstoqueCaixas(),
