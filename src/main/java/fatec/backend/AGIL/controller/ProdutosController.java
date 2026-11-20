@@ -2,9 +2,11 @@
 package fatec.backend.AGIL.controller;
 
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import fatec.backend.AGIL.dto.ProdutosDTO;
 import fatec.backend.AGIL.service.ProdutosService;
 
@@ -18,21 +20,24 @@ public class ProdutosController {
         this.produtosService = produtosService;
     }
 
-    // GET - listar produtos
+    // GET - listar produtos de um gestor
     @GetMapping
     public List<ProdutosDTO> listarTodos(
-            @RequestParam(required = false) Long gestorId) {
+            @RequestParam Long gestorId) {
 
         return produtosService.listarTodos(gestorId);
     }
 
-    // GET - buscar por ID
+    // GET - buscar produto por ID, validando o gestor
     @GetMapping("/{id}")
-    public ProdutosDTO buscar(@PathVariable Long id) {
-        return produtosService.buscarPorId(id);
+    public ProdutosDTO buscar(
+            @PathVariable Long id,
+            @RequestParam Long gestorId) {
+
+        return produtosService.buscarPorId(id, gestorId);
     }
 
-    // POST - cadastrar
+    // POST - cadastrar produto
     @PostMapping
     public ResponseEntity<ProdutosDTO> criar(
             @RequestBody ProdutosDTO produtos) {
@@ -43,31 +48,35 @@ public class ProdutosController {
                 .body(produtoSalvo);
     }
 
-    // PATCH - atualizar campos
+    // PATCH - atualizar campos, validando o gestor
     @PatchMapping("/{id}")
     public ResponseEntity<ProdutosDTO> atualizarCampo(
             @PathVariable Long id,
+            @RequestParam Long gestorId,
             @RequestBody ProdutosDTO dados) {
 
         return ResponseEntity.ok(
-            produtosService.atualizarCampo(id, dados)
+                produtosService.atualizarCampo(id, gestorId, dados)
         );
     }
 
-    // PUT - atualizar geral
+    // PUT - atualizar produto completo, validando o gestor
     @PutMapping("/{id}")
     public ProdutosDTO atualizar(
             @PathVariable Long id,
+            @RequestParam Long gestorId,
             @RequestBody ProdutosDTO produtos) {
 
-        return produtosService.atualizar(id, produtos);
+        return produtosService.atualizar(id, gestorId, produtos);
     }
 
-    // DELETE - excluir
+    // DELETE - excluir produto, validando o gestor
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(
+            @PathVariable Long id,
+            @RequestParam Long gestorId) {
 
-        produtosService.excluir(id);
+        produtosService.excluir(id, gestorId);
 
         return ResponseEntity.noContent().build();
     }

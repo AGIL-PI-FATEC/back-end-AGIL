@@ -45,18 +45,44 @@ public class ProdutosService {
         );
     }
 
-    // GET - listar todos ou por gestor
-    public List<ProdutosDTO> listarTodos(Long gestorId) {
+    // Valida se o produto existe e pertence ao gestor informado
+    private Produtos buscarProdutoDoGestor(Long id, Long gestorId) {
 
-        List<Produtos> produtos;
-
-        if (gestorId != null) {
-            produtos = produtosRepository.findByGestor_Id(gestorId);
-        } else {
-            produtos = produtosRepository.findAll();
+        if (gestorId == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "O ID do gestor é obrigatório."
+            );
         }
 
-        return produtos.stream()
+        Produtos produto = produtosRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Produto não encontrado: id " + id
+                ));
+
+        if (produto.getGestor() == null || !produto.getGestor().getId().equals(gestorId)) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Acesso negado: este produto pertence a outro gestor."
+            );
+        }
+
+        return produto;
+    }
+
+    // GET - listar produtos de um gestor (obrigatório)
+    public List<ProdutosDTO> listarTodos(Long gestorId) {
+
+        if (gestorId == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "O ID do gestor é obrigatório."
+            );
+        }
+
+        return produtosRepository.findByGestor_Id(gestorId)
+                .stream()
                 .map(this::converterDTO)
                 .toList();
     }
@@ -110,27 +136,19 @@ public class ProdutosService {
         return converterDTO(salvo);
     }
 
-    // GET - buscar por ID
-    public ProdutosDTO buscarPorId(Long id) {
+    // GET - buscar por ID (validando o gestor)
+    public ProdutosDTO buscarPorId(Long id, Long gestorId) {
 
-        Produtos produto = produtosRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Produto não encontrado: id " + id
-                ));
+        Produtos produto = buscarProdutoDoGestor(id, gestorId);
 
         return converterDTO(produto);
     }
 
-    // C. PATCH - atualizar campos (com preservação/atualização da imagem)
+    // C. PATCH - atualizar campos (validando o gestor)
     @Transactional
-    public ProdutosDTO atualizarCampo(Long id, ProdutosDTO dados) {
+    public ProdutosDTO atualizarCampo(Long id, Long gestorId, ProdutosDTO dados) {
 
-        Produtos produto = produtosRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Produto não encontrado: id " + id
-                ));
+        Produtos produto = buscarProdutoDoGestor(id, gestorId);
 
         Integer estoqueAnterior = produto.getEstoqueCaixas();
         Integer qtdPorCaixaAnterior = produto.getQtdPorCaixa();
@@ -175,15 +193,11 @@ public class ProdutosService {
         return converterDTO(atualizado);
     }
 
-    // D. PUT - atualizar geral (com preservação/atualização condicional da imagem)
+    // D. PUT - atualizar geral (validando o gestor)
     @Transactional
-    public ProdutosDTO atualizar(Long id, ProdutosDTO novo) {
+    public ProdutosDTO atualizar(Long id, Long gestorId, ProdutosDTO novo) {
 
-        Produtos existente = produtosRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Produto não encontrado: id " + id
-                ));
+        Produtos existente = buscarProdutoDoGestor(id, gestorId);
 
         Integer estoqueAnterior = existente.getEstoqueCaixas();
         Integer qtdPorCaixaAnterior = existente.getQtdPorCaixa();
@@ -268,17 +282,13 @@ public class ProdutosService {
         }
     }
 
-    // DELETE
-    public void excluir(Long id) {
+    // DELETE (validando o gestor)
+    @Transactional
+    public void excluir(Long id, Long gestorId) {
 
-        if (!produtosRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Produto não encontrado: id " + id
-            );
-        }
+        Produtos produto = buscarProdutoDoGestor(id, gestorId);
 
         // O histórico permanece salvo após a exclusão.
-        produtosRepository.deleteById(id);
+        produtosRepository.delete(produto);
     }
 }
