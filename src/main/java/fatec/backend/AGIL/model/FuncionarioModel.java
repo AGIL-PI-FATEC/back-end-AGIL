@@ -26,8 +26,8 @@ public class FuncionarioModel {
     @Column(name = "cargo_funcionario", nullable = false, length = 60)
     private String cargo;
 
-    @Column(name = "foto_url", length = 255)
-    private String fotoUrl;
+    @Column(name = "foto", columnDefinition = "LONGTEXT")
+    private String foto;
 
     // Cada funcionário pertence à empresa de um gestor
     @ManyToOne(optional = false)

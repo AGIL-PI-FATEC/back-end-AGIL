@@ -19,7 +19,7 @@ public class FuncionarioCadastroDTO {
     @NotBlank(message = "O cargo é obrigatório")
     private String cargo;
 
-    private String fotoUrl;
+    private String foto;
 
     @NotNull(message = "O ID do gestor é obrigatório")
     private Long gestorId;

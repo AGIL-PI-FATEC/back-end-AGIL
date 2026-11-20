@@ -17,5 +17,5 @@ public class FuncionarioAtualizacaoDTO {
     @NotBlank(message = "O cargo é obrigatório")
     private String cargo;
 
-    private String fotoUrl;
+    private String foto;
 }

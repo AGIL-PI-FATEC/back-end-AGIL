@@ -1,4 +1,3 @@
-
 package fatec.backend.AGIL.service;
 
 import fatec.backend.AGIL.dto.FuncionarioAtualizacaoDTO;
@@ -50,7 +49,7 @@ public class FuncionarioService {
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
         funcionario.setCargo(dto.getCargo());
-        funcionario.setFotoUrl(dto.getFotoUrl());
+        funcionario.setFoto(dto.getFoto());
         funcionario.setGestor(gestor);
 
         // Aplica o hash BCrypt na senha
@@ -110,7 +109,10 @@ public class FuncionarioService {
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
         funcionario.setCargo(dto.getCargo());
-        funcionario.setFotoUrl(dto.getFotoUrl());
+        
+        if (dto.getFoto() != null) {
+            funcionario.setFoto(dto.getFoto());
+        }
 
         FuncionarioModel atualizado = funcionarioRepository.save(funcionario);
         return new FuncionarioRespostaDTO(atualizado);

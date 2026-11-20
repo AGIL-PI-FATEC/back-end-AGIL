@@ -10,7 +10,7 @@ public class FuncionarioRespostaDTO {
     private String nome;
     private String email;
     private String cargo;
-    private String fotoUrl;
+    private String foto;
     private Long gestorId;
     private String nomeEmpresa;
     // a senha não é enviada para o front
@@ -20,7 +20,7 @@ public class FuncionarioRespostaDTO {
         this.nome = funcionario.getNome();
         this.email = funcionario.getEmail();
         this.cargo = funcionario.getCargo();
-        this.fotoUrl = funcionario.getFotoUrl();
+        this.foto = funcionario.getFoto();
         this.gestorId = funcionario.getGestor().getId();
         this.nomeEmpresa = funcionario.getGestor().getNomeEmpresa();
     }
