@@ -32,4 +32,7 @@ public class GestorModel {
 
     @Column(name = "nome_empresa", length = 80)
     private String nomeEmpresa;
+
+    @Column(name = "foto", columnDefinition = "LONGTEXT")
+    private String foto;
 }

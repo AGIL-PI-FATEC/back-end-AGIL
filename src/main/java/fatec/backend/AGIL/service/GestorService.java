@@ -69,7 +69,7 @@ public class GestorService {
                 .collect(Collectors.toList());
     }
 
-    // 4. Atualizar Nome e E-mail
+    // 4. Atualizar Nome, E-mail e Foto (condicionalmente)
     public GestorRespostaDTO atualizar(Long id, GestorAtualizacaoDTO dto) {
         GestorModel gestor = gestorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Gestor não encontrado com o ID: " + id));
@@ -81,6 +81,11 @@ public class GestorService {
 
         gestor.setNome(dto.getNome());
         gestor.setEmail(dto.getEmail());
+
+        // Atualiza a foto somente se uma nova imagem for enviada
+        if (dto.getFoto() != null) {
+            gestor.setFoto(dto.getFoto());
+        }
 
         GestorModel atualizado = gestorRepository.save(gestor);
         return new GestorRespostaDTO(atualizado);

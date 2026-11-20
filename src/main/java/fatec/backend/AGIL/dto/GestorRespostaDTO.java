@@ -12,6 +12,7 @@ public class GestorRespostaDTO {
     private String cnpj;
     private String razaoSocial;
     private String nomeEmpresa;
+    private String foto;
     //private String senha;            //aqui eu comentei pq não vamos mandar isso para o front, mas para testes, descomente
 
     public GestorRespostaDTO(GestorModel gestor) {
@@ -21,6 +22,7 @@ public class GestorRespostaDTO {
         this.cnpj = gestor.getCnpj();
         this.razaoSocial = gestor.getRazaoSocial();
         this.nomeEmpresa = gestor.getNomeEmpresa();
+        this.foto = gestor.getFoto();
         //this.senha = gestor.getSenha();            //aqui eu comentei pq não vamos mandar isso para o front, mas para testes, descomente
     }
 }

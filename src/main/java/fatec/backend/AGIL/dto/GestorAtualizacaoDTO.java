@@ -13,4 +13,6 @@ public class GestorAtualizacaoDTO {
     @NotBlank(message = "O e-mail é obrigatório")
     @Email(message = "Formato de e-mail inválido")
     private String email;
+    private String foto;
+    
 }
