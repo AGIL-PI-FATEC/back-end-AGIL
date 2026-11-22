@@ -16,4 +16,6 @@ public interface FuncionarioRepository extends JpaRepository<FuncionarioModel, L
     Optional<FuncionarioModel> findByEmail(String email);
 
     List<FuncionarioModel> findByGestorId(Long gestorId);
+
+    boolean existsByGestorId(Long gestorId);
 }

@@ -12,6 +12,6 @@ public class LoginDTO {
     @Email(message = "Formato de email inválido")
     private String email;
 
-    @NotBlank(message = "A senha é obriagtória")
+    @NotBlank(message = "A senha é obrigatória")
     private String senha;
 }
