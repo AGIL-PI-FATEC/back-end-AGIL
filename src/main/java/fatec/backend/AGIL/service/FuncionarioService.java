@@ -10,8 +10,10 @@ import fatec.backend.AGIL.model.GestorModel;
 import fatec.backend.AGIL.repository.FuncionarioRepository;
 import fatec.backend.AGIL.repository.GestorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,11 +63,12 @@ public class FuncionarioService {
 
     // 7. Login do Funcionário
     public FuncionarioRespostaDTO login(LoginDTO dto) {
+        // Credenciais inválidas retornam 401 (tratado pelo GlobalExceptionHandler)
         FuncionarioModel funcionario = funcionarioRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos."));
 
         if (!passwordEncoder.matches(dto.getSenha(), funcionario.getSenha())) {
-            throw new RuntimeException("E-mail ou senha inválidos.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos.");
         }
 
         return new FuncionarioRespostaDTO(funcionario);
