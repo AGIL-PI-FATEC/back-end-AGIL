@@ -153,11 +153,18 @@ public class ProdutosService {
         Integer estoqueAnterior = produto.getEstoqueCaixas();
         Integer qtdPorCaixaAnterior = produto.getQtdPorCaixa();
 
+        // No PATCH os campos são opcionais, mas se vierem precisam ser válidos
         if (dados.nome() != null) {
+            if (dados.nome().isBlank()) {
+                throw new IllegalArgumentException("O nome do produto não pode ser vazio.");
+            }
             produto.setNome(dados.nome());
         }
 
         if (dados.preco() != null) {
+            if (dados.preco().signum() <= 0) {
+                throw new IllegalArgumentException("O preço deve ser maior que zero.");
+            }
             produto.setPreco(dados.preco());
         }
 

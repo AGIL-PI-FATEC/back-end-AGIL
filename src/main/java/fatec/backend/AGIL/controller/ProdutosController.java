@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import fatec.backend.AGIL.dto.ProdutosDTO;
 import fatec.backend.AGIL.service.ProdutosService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/produtos")
+@CrossOrigin(origins = "*")
 public class ProdutosController {
 
     private final ProdutosService produtosService;
@@ -40,7 +42,7 @@ public class ProdutosController {
     // POST - cadastrar produto
     @PostMapping
     public ResponseEntity<ProdutosDTO> criar(
-            @RequestBody ProdutosDTO produtos) {
+            @RequestBody @Valid ProdutosDTO produtos) {
 
         ProdutosDTO produtoSalvo = produtosService.salvar(produtos);
 
@@ -65,7 +67,7 @@ public class ProdutosController {
     public ProdutosDTO atualizar(
             @PathVariable Long id,
             @RequestParam Long gestorId,
-            @RequestBody ProdutosDTO produtos) {
+            @RequestBody @Valid ProdutosDTO produtos) {
 
         return produtosService.atualizar(id, gestorId, produtos);
     }
