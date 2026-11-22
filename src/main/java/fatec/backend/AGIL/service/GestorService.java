@@ -5,9 +5,10 @@ import fatec.backend.AGIL.dto.GestorCadastroDTO;
 import fatec.backend.AGIL.dto.GestorRespostaDTO;
 import fatec.backend.AGIL.dto.LoginDTO;
 import fatec.backend.AGIL.model.GestorModel;
+import fatec.backend.AGIL.repository.FuncionarioRepository;
 import fatec.backend.AGIL.repository.GestorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,12 @@ public class GestorService {
     @Autowired
     private GestorRepository gestorRepository;
 
-    // Instancia o encriptador BCrypt para a senha
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private FuncionarioRepository funcionarioRepository;
+
+    // Encriptador BCrypt registrado como @Bean no SecurityConfig
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // 1. Cadastrar Gestor
     public GestorRespostaDTO cadastrar(GestorCadastroDTO dto) {
@@ -31,12 +36,12 @@ public class GestorService {
 
         // Valida se o email já existe
         if (gestorRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Este email já existe no sistema.");
+            throw new RuntimeException("Este e-mail já está cadastrado no sistema.");
         }
 
         // Valida se o CNPJ já existe
         if (gestorRepository.existsByCnpj(dto.getCnpj())) {
-            throw new RuntimeException("Este CNPJ já existe no sistema.");
+            throw new RuntimeException("Este CNPJ já está cadastrado no sistema.");
         }
 
         // Mapeia DTO para Entity
@@ -91,11 +96,18 @@ public class GestorService {
         if (!gestorRepository.existsById(id)) {
             throw new RuntimeException("Gestor não encontrado com o ID: " + id);
         }
+        // Impede apagar a empresa enquanto houver funcionários vinculados (evita erro de chave estrangeira)
+        if (funcionarioRepository.existsByGestorId(id)) {
+            throw new IllegalStateException("Não é possível excluir o gestor: existem funcionários vinculados a ele. Exclua-os primeiro.");
+        }
         gestorRepository.deleteById(id);
     }
 
     // 6. Deletar todos os gestores cadastrados
     public void deletarTodos() {
+        if (funcionarioRepository.count() > 0) {
+            throw new IllegalStateException("Não é possível excluir os gestores: existem funcionários cadastrados. Exclua-os primeiro.");
+        }
         gestorRepository.deleteAll();
     }
 
